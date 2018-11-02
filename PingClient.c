@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#include <limits.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -40,12 +41,12 @@ int main(int argc, char *argv[])
 
    //variable for storing 
    struct timeval tv, timeout;
-   double max = 0.0, min = 999999999.0, total;
+   double max = INT_MIN * 1.0, min = INT_MAX * 1.0, total;
    int numLostPackets = 0, numRecvdPackets = 0;
    for(int i = 1; i < 11; i++)
    {
        gettimeofday(&tv, NULL);
-       double milliseconds = (tv.tv_sec) / 1000 + (tv.tv_usec) * 1000;
+       double milliseconds = (tv.tv_sec) * 1000.0 + (tv.tv_usec) / 1000.0;
        sprintf(buffer, "%s%d%s%f", "PING ", i, " ", milliseconds);
        n = sendto(sock, buffer, sizeof(buffer), 0, (const struct sockaddr *)&server, length);
        if (n < 0) perror("Error sending to socket");
@@ -61,12 +62,13 @@ int main(int argc, char *argv[])
 
        if(n < 0)
        {
+           printf("Request timed out \n");
        }
        else
        {
            struct timeval recvdtime;
            gettimeofday(&recvdtime, NULL);
-           double recvdmilliseconds = (recvdtime.tv_sec) / 1000 + (recvdtime.tv_usec) * 1000;
+           double recvdmilliseconds = (recvdtime.tv_sec) * 1000.0 + (recvdtime.tv_usec) / 1000.0;
            numRecvdPackets++;
            char output[1024];
            int chtoi[1024];
@@ -95,6 +97,10 @@ int main(int argc, char *argv[])
            printf("%f ms\n", diffMilliseconds);
            memset(buffer, 0, 1024);
        } 
+   }
+   if(numRecvdPackets == 0)
+   {
+       printf("--- ping statistics --- 10 packets transmitted, 0 received, 100%% packet loss rtt min/avg/max = 0.0 0.0 0.0 ms");
    }
    int percent = (10 - numRecvdPackets) * 10;
    printf("--- ping statistics --- %d packets transmitted, %d received, %d%% packet loss rtt min/avg/max = %f %f %f ms", 10, numRecvdPackets, percent, min, total / numRecvdPackets, max);
