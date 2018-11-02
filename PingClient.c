@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
                min = diffMilliseconds;
            }
            
-           printf("%f ms\n", diffMilliseconds);
+           printf("%.3f ms\n", diffMilliseconds);
            memset(buffer, 0, 1024);
        } 
    }
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
        printf("--- ping statistics --- 10 packets transmitted, 0 received, 100%% packet loss rtt min/avg/max = 0.0 0.0 0.0 ms");
    }
    int percent = (10 - numRecvdPackets) * 10;
-   printf("--- ping statistics --- %d packets transmitted, %d received, %d%% packet loss rtt min/avg/max = %f %f %f ms", 10, numRecvdPackets, percent, min, total / numRecvdPackets, max);
+   printf("--- ping statistics --- %d packets transmitted, %d received, %d%% packet loss rtt min/avg/max = %.3f %.3f %.3f ms", 10, numRecvdPackets, percent, min, total / numRecvdPackets, max);
    close(sock);
    return 0;
 }
